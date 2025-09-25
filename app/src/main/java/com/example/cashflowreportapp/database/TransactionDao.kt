@@ -12,4 +12,7 @@ interface TransactionDao {
 
     @Query("SELECT * FROM transactions ORDER BY date DESC")
     fun getAllTransactions(): LiveData<List<Transaction>>
+
+    @Query("SELECT SUM(amount) FROM transactions WHERE type = :transactionType")
+    fun getTotalAmountByType(transactionType: String): LiveData<Double?>
 }
