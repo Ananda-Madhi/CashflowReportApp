@@ -15,8 +15,10 @@ import com.example.cashflowreportapp.database.Transaction
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 
-
 class AddTransactionFragment : Fragment() {
+
+    // 👇 batas maksimal transaksi
+    private val MAX_LIMIT = 100_000_000.0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_add_transacction, container, false)
@@ -38,6 +40,16 @@ class AddTransactionFragment : Fragment() {
 
             if (title.isEmpty() || amount == null) {
                 Toast.makeText(context, "Judul dan Jumlah tidak boleh kosong!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // ✅ cek batas maksimal
+            if (amount > MAX_LIMIT) {
+                Toast.makeText(
+                    context,
+                    "Jumlah maksimal transaksi adalah Rp 100.000.000",
+                    Toast.LENGTH_LONG
+                ).show()
                 return@setOnClickListener
             }
 

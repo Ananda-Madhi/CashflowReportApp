@@ -1,106 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/white"
     tools:context=".TransactionsFragment">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/summary_card"
+    <!-- Header (Profile + Title + Settings) -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        app:cardElevation="4dp">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_person"
+            android:scaleType="centerCrop"
+            android:background="@drawable/circle_background"
+            android:padding="4dp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="My Wallet"
+            android:textStyle="bold"
+            android:textSize="18sp"/>
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_settings"/>
+    </LinearLayout>
+
+    <!-- Balance Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:cardElevation="6dp"
+        app:cardCornerRadius="12dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="20dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:text="Total Balance"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="14sp" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Total Pemasukan"
-                    android:textAppearance="?attr/textAppearanceBodyMedium" />
-
-                <TextView
-                    android:id="@+id/text_total_income"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Rp 0"
-                    android:textColor="@android:color/holo_green_dark"
-                    android:textStyle="bold"
-                    android:textAppearance="?attr/textAppearanceBodyMedium" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
+            <!-- Balance in IDR -->
+            <TextView
+                android:id="@+id/text_balance"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:orientation="horizontal">
+                android:text="Rp 149,868"
+                android:textSize="26sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Total Pengeluaran"
-                    android:textAppearance="?attr/textAppearanceBodyMedium" />
-
-                <TextView
-                    android:id="@+id/text_total_expense"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Rp 0"
-                    android:textColor="@android:color/holo_red_dark"
-                    android:textStyle="bold"
-                    android:textAppearance="?attr/textAppearanceBodyMedium" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="?android:attr/listDivider"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
+            <!-- Balance in USD (new) -->
+            <TextView
+                android:id="@+id/text_balance_usd"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_marginTop="4dp"
+                android:text="$9.50"
+                android:textSize="16sp"
+                android:textColor="@android:color/darker_gray"/>
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Saldo Akhir"
-                    android:textStyle="bold"
-                    android:textAppearance="?attr/textAppearanceTitleMedium" />
-
-                <TextView
-                    android:id="@+id/text_balance"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Rp 0"
-                    android:textStyle="bold"
-                    android:textAppearance="?attr/textAppearanceTitleMedium" />
-            </LinearLayout>
-
+            <!-- Balance Change -->
+            <TextView
+                android:id="@+id/text_balance_change"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:padding="4dp"
+                android:layout_marginTop="8dp"/>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
+    <!-- RecyclerView for transactions -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/summary_card"
+        android:paddingHorizontal="8dp"
         tools:listitem="@layout/item_transaction"/>
-
-</RelativeLayout>
+</LinearLayout>

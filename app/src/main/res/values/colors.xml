@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Primary Theme Colors -->
+    <color name="purple_500">#6200EE</color>
+    <color name="purple_700">#3700B3</color>
+    <color name="teal_200">#03DAC5</color>
+    <color name="teal_700">#018786</color>
+
+    <!-- Background & Text -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="gray_light">#F5F5F5</color>
+    <color name="gray_dark">#757575</color>
+
+    <!-- Accent / Vibrant Options -->
+    <color name="pink_accent">#C17498</color> <!-- sesuai tema kamu -->
+    <color name="green_accent">#4CAF50</color>
+    <color name="red_accent">#F44336</color>
+    <color name="blue_accent">#2196F3</color>
+
+    <!-- Button -->
+    <color name="button_primary">#6200EE</color> <!-- sama dengan purple_500 -->
+    <color name="button_primary_pressed">#3700B3</color>
+
+    <!-- Radio Button -->
+    <color name="radio_checked">#018786</color> <!-- teal_700 -->
+    <color name="radio_unchecked">#757575</color>
 </resources>

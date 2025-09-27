@@ -8,29 +8,38 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.cashflowreportapp.api.ExchangeResponse
+import com.example.cashflowreportapp.api.RetrofitClient
 import com.example.cashflowreportapp.database.AppDatabase
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.text.NumberFormat
 import java.util.*
 
 class TransactionsFragment : Fragment() {
     private lateinit var transactionAdapter: TransactionAdapter
-    private lateinit var textTotalIncome: TextView
-    private lateinit var textTotalExpense: TextView
     private lateinit var textBalance: TextView
+    private lateinit var textBalanceUsd: TextView   // 👈 add this
+    private lateinit var textBalanceChange: TextView
 
     private var totalIncome: Double = 0.0
     private var totalExpense: Double = 0.0
+    private var lastBalance: Double = 0.0
+    private var isFirstUpdate = true
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_transactions, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        textTotalIncome = view.findViewById(R.id.text_total_income)
-        textTotalExpense = view.findViewById(R.id.text_total_expense)
         textBalance = view.findViewById(R.id.text_balance)
+        textBalanceUsd = view.findViewById(R.id.text_balance_usd) // 👈 initialize
+        textBalanceChange = view.findViewById(R.id.text_balance_change)
 
         val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(context)
@@ -61,8 +70,37 @@ class TransactionsFragment : Fragment() {
         val formatter = NumberFormat.getCurrencyInstance(Locale("in", "ID"))
         formatter.maximumFractionDigits = 0
 
-        textTotalIncome.text = formatter.format(totalIncome)
-        textTotalExpense.text = formatter.format(totalExpense)
         textBalance.text = formatter.format(balance)
+
+        // Example: fake conversion rate 1 USD = 16000 IDR
+        val usdRate = 16000.0
+        val usdBalance = balance / usdRate
+        textBalanceUsd.text = "$" + String.format("%.2f", usdBalance)  // 👈 no crash
+
+        if (!isFirstUpdate) {
+            updateBalanceChange(balance, formatter)
+        } else {
+            textBalanceChange.text = "No Change"
+            textBalanceChange.setBackgroundResource(R.drawable.bg_gray_badge)
+            isFirstUpdate = false
+        }
+
+        lastBalance = balance
+    }
+
+    private fun updateBalanceChange(currentBalance: Double, formatter: NumberFormat) {
+        val difference = currentBalance - lastBalance
+
+        if (difference > 0) {
+            textBalanceChange.text = "+${formatter.format(difference)}"
+            textBalanceChange.setBackgroundResource(R.drawable.bg_green_badge)
+        } else if (difference < 0) {
+            textBalanceChange.text = formatter.format(difference) // already negative
+            textBalanceChange.setBackgroundResource(R.drawable.bg_red_badge)
+        } else {
+            textBalanceChange.text = "No Change"
+            textBalanceChange.setBackgroundResource(R.drawable.bg_gray_badge)
+        }
     }
 }
+
