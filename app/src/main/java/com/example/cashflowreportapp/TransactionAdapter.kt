@@ -1,21 +1,29 @@
 package com.example.cashflowreportapp
+
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cashflowreportapp.database.Transaction
 import java.text.SimpleDateFormat
 import java.util.*
-import com.example.cashflowreportapp.R
 
-class TransactionAdapter(private var transactions: List<Transaction>) : RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder>() {
+class TransactionAdapter(
+    private var transactions: List<Transaction>,
+    private val onEditClick: (Transaction) -> Unit,
+    private val onDeleteClick: (Transaction) -> Unit
+) : RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder>() {
 
-    class TransactionViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val title: TextView = view.findViewById(R.id.transaction_title)
-        val date: TextView = view.findViewById(R.id.transaction_date)
-        val amount: TextView = view.findViewById(R.id.transaction_amount)
+    fun getTransactionAt(position: Int): Transaction {
+        return transactions[position]
+    }
+
+    fun updateData(newTransactions: List<Transaction>) {
+        this.transactions = newTransactions
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
@@ -38,12 +46,18 @@ class TransactionAdapter(private var transactions: List<Transaction>) : Recycler
         } else {
             holder.amount.setTextColor(Color.GREEN)
         }
+
+        holder.btnEdit.setOnClickListener { onEditClick(transaction) }
+        holder.btnDelete.setOnClickListener { onDeleteClick(transaction) }
     }
 
     override fun getItemCount() = transactions.size
 
-    fun updateData(newTransactions: List<Transaction>) {
-        this.transactions = newTransactions
-        notifyDataSetChanged()
+    class TransactionViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val title: TextView = view.findViewById(R.id.transaction_title)
+        val date: TextView = view.findViewById(R.id.transaction_date)
+        val amount: TextView = view.findViewById(R.id.transaction_amount)
+        val btnEdit: ImageButton = view.findViewById(R.id.btn_edit)
+        val btnDelete: ImageButton = view.findViewById(R.id.btn_delete)
     }
 }
