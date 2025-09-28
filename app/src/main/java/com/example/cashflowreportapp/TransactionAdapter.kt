@@ -8,6 +8,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cashflowreportapp.database.Transaction
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -38,8 +39,8 @@ class TransactionAdapter(
         val sdf = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
         holder.date.text = sdf.format(Date(transaction.date))
 
-        val formattedAmount = String.format(Locale.GERMANY, "Rp %,.0f", transaction.amount)
-        holder.amount.text = formattedAmount
+        // PERUBAHAN: Format amount berdasarkan mata uang
+        holder.amount.text = formatCurrency(transaction.amount, transaction.currency)
 
         if (transaction.type == "EXPENSE") {
             holder.amount.setTextColor(Color.RED)
@@ -49,6 +50,23 @@ class TransactionAdapter(
 
         holder.btnEdit.setOnClickListener { onEditClick(transaction) }
         holder.btnDelete.setOnClickListener { onDeleteClick(transaction) }
+    }
+
+    // FUNGSI BARU: untuk format mata uang
+    private fun formatCurrency(amount: Double, currencyCode: String): String {
+        val locale = when (currencyCode) {
+            "IDR" -> Locale("in", "ID")
+            "USD" -> Locale.US
+            "EUR" -> Locale.GERMANY
+            "JPY" -> Locale.JAPAN
+            "GBP" -> Locale.UK
+            else -> Locale.getDefault()
+        }
+        val formatter = NumberFormat.getCurrencyInstance(locale)
+        if (currencyCode == "IDR") {
+            formatter.maximumFractionDigits = 0
+        }
+        return formatter.format(amount)
     }
 
     override fun getItemCount() = transactions.size
