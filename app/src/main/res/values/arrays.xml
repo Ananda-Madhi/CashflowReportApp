@@ -6,5 +6,20 @@
         <item>EUR</item>
         <item>JPY</item>
         <item>GBP</item>
+        <item>SGD</item>
+    </string-array>
+
+    <string-array name="transaction_currencies">
+        <item>IDR</item>
+        <item>USD</item>
+        <item>EUR</item>
+        <item>JPY</item>
+        <item>GBP</item>
+        <item>AUD</item>
+        <item>SGD</item>
+        <item>CNY</item>
+        <item>KRW</item>
+        <item>MYR</item>
+        <item>THB</item>
     </string-array>
 </resources>
