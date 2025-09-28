@@ -1,6 +1,7 @@
 package com.example.cashflowreportapp
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,12 +19,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import java.io.InputStreamReader
+import java.math.BigDecimal // <-- TAMBAHAN: Import ini
 import java.net.HttpURLConnection
 import java.net.URL
 import java.text.NumberFormat
 import java.util.*
-import android.util.Log
 
 class TransactionsFragment : Fragment() {
 
@@ -33,14 +33,11 @@ class TransactionsFragment : Fragment() {
     private lateinit var textBalance: TextView
     private lateinit var currencySpinner: Spinner
     private lateinit var convertedBalance: TextView
+    private lateinit var allTransactions: List<Transaction>
 
-    private var totalIncome: Double = 0.0
-    private var totalExpense: Double = 0.0
-
-    private val currencies = arrayOf(
-        "USD", "EUR", "JPY", "GBP", "AUD",
-        "SGD", "CNY", "KRW", "MYR", "THB"
-    )
+    private var totalIncomeInBaseCurrency: Double = 0.0
+    private var totalExpenseInBaseCurrency: Double = 0.0
+    private val baseCurrency = "IDR"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -60,9 +57,6 @@ class TransactionsFragment : Fragment() {
         val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        val database = AppDatabase.getDatabase(requireContext())
-        val transactionDao = database.transactionDao()
-
         transactionAdapter = TransactionAdapter(
             emptyList(),
             onEditClick = { transaction -> showEditDialog(transaction) },
@@ -70,46 +64,25 @@ class TransactionsFragment : Fragment() {
         )
         recyclerView.adapter = transactionAdapter
 
-        // Observe daftar transaksi
+        val database = AppDatabase.getDatabase(requireContext())
+        val transactionDao = database.transactionDao()
+
         transactionDao.getAllTransactions().observe(viewLifecycleOwner) { transactions ->
+            allTransactions = transactions
             transactionAdapter.updateData(transactions)
+            calculateBalance()
         }
 
-        // Observe total income
-        transactionDao.getTotalAmountByType("INCOME").observe(viewLifecycleOwner) { income ->
-            totalIncome = income ?: 0.0
-            updateBalanceUI()
-        }
+        setupSwipeToDelete(recyclerView)
+        setupCurrencySpinner()
+    }
 
-        // Observe total expense
-        transactionDao.getTotalAmountByType("EXPENSE").observe(viewLifecycleOwner) { expense ->
-            totalExpense = expense ?: 0.0
-            updateBalanceUI()
-        }
-
-        // Swipe edit & delete
-        val itemTouchHelper = ItemTouchHelper(object :
-            ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
-            override fun onMove(
-                recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder
-            ) = false
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val position = viewHolder.adapterPosition
-                val transaction = transactionAdapter.getTransactionAt(position)
-
-                if (direction == ItemTouchHelper.RIGHT) {
-                    showEditDialog(transaction)
-                    transactionAdapter.notifyItemChanged(position)
-                } else if (direction == ItemTouchHelper.LEFT) {
-                    showDeleteDialog(transaction, position)
-                }
-            }
-        })
-        itemTouchHelper.attachToRecyclerView(recyclerView)
-
-        // Spinner currency
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, currencies)
+    private fun setupCurrencySpinner() {
+        val adapter = ArrayAdapter.createFromResource(
+            requireContext(),
+            R.array.transaction_currencies,
+            android.R.layout.simple_spinner_item
+        )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         currencySpinner.adapter = adapter
 
@@ -117,38 +90,80 @@ class TransactionsFragment : Fragment() {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 updateConvertedBalance()
             }
-
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
     }
-    private fun updateConvertedBalance() {
-        val selectedCurrency = currencySpinner.selectedItem?.toString() ?: return
-        val balance = totalIncome - totalExpense
 
+    private fun calculateBalance() {
         lifecycleScope.launch {
-            val rate = fetchExchangeRate("IDR", selectedCurrency)
-            if (rate > 0) {
-                val converted = balance * rate
-                val formatter = NumberFormat.getCurrencyInstance(getLocaleForCurrency(selectedCurrency))
-                convertedBalance.text = "Balance: ${formatter.format(converted)}"
-            } else {
-                convertedBalance.text = "Error fetching rate"
+            var income = 0.0
+            var expense = 0.0
+
+            val rateCache = mutableMapOf<String, Double>()
+
+            for (transaction in allTransactions) {
+                val rate = if (transaction.currency == baseCurrency) {
+                    1.0
+                } else {
+                    if (rateCache.containsKey(transaction.currency)) {
+                        rateCache[transaction.currency]!!
+                    } else {
+                        val fetchedRate = fetchExchangeRate(transaction.currency, baseCurrency)
+                        rateCache[transaction.currency] = fetchedRate
+                        fetchedRate
+                    }
+                }
+
+                val amountInBase = transaction.amount * rate
+                if (transaction.type == "INCOME") {
+                    income += amountInBase
+                } else {
+                    expense += amountInBase
+                }
+            }
+
+            totalIncomeInBaseCurrency = income
+            totalExpenseInBaseCurrency = expense
+
+            withContext(Dispatchers.Main) {
+                updateBalanceUI()
             }
         }
     }
+
     private fun updateBalanceUI() {
-        val balance = totalIncome - totalExpense
+        val balance = totalIncomeInBaseCurrency - totalExpenseInBaseCurrency
         val formatter = NumberFormat.getCurrencyInstance(Locale("in", "ID"))
         formatter.maximumFractionDigits = 0
-        textTotalIncome.text = formatter.format(totalIncome)
-        textTotalExpense.text = formatter.format(totalExpense)
+
+        textTotalIncome.text = formatter.format(totalIncomeInBaseCurrency)
+        textTotalExpense.text = formatter.format(totalExpenseInBaseCurrency)
         textBalance.text = formatter.format(balance)
 
-        // update balance konversi juga
         updateConvertedBalance()
     }
 
+    private fun updateConvertedBalance() {
+        val selectedCurrency = currencySpinner.selectedItem.toString()
+        val balanceInBase = totalIncomeInBaseCurrency - totalExpenseInBaseCurrency
 
+        if (selectedCurrency == baseCurrency) {
+            convertedBalance.visibility = View.GONE
+            return
+        }
+        convertedBalance.visibility = View.VISIBLE
+
+        lifecycleScope.launch {
+            val rate = fetchExchangeRate(baseCurrency, selectedCurrency)
+            if (rate > 0) {
+                val converted = balanceInBase * rate
+                val formatter = NumberFormat.getCurrencyInstance(getLocaleForCurrency(selectedCurrency))
+                convertedBalance.text = "Balance: ${formatter.format(converted)}"
+            } else {
+                convertedBalance.text = "Error fetching rate for $selectedCurrency"
+            }
+        }
+    }
 
     private suspend fun fetchExchangeRate(from: String, to: String): Double {
         return withContext(Dispatchers.IO) {
@@ -156,90 +171,54 @@ class TransactionsFragment : Fragment() {
                 val apiUrl = "https://open.er-api.com/v6/latest/$from"
                 val url = URL(apiUrl)
                 val connection = url.openConnection() as HttpURLConnection
+                val result = connection.inputStream.bufferedReader().readText()
+                val json = JSONObject(result)
 
-                connection.inputStream.bufferedReader().use { reader ->
-                    val result = reader.readText()
-                    val json = JSONObject(result)
-
-                    // cek dulu status respons
-                    if (json.optString("result") == "success") {
-                        val rates = json.getJSONObject("rates")
-                        return@withContext rates.optDouble(to, 0.0)
-                    } else {
-                        return@withContext 0.0
-                    }
+                if (json.optString("result") == "success") {
+                    json.getJSONObject("rates").optDouble(to, 0.0)
+                } else {
+                    0.0
                 }
             } catch (e: Exception) {
-                Log.e("ExchangeRate", "Error fetching exchange rate", e)
+                Log.e("ExchangeRate", "Error fetching exchange rate from $from to $to", e)
                 0.0
             }
         }
     }
 
-
-    private fun getLocaleForCurrency(currency: String): Locale {
-        return when (currency) {
-            "USD" -> Locale.US
-            "EUR" -> Locale.GERMANY
-            "JPY" -> Locale.JAPAN
-            "GBP" -> Locale.UK
-            "AUD" -> Locale("en", "AU")
-            "SGD" -> Locale("en", "SG")
-            "CNY" -> Locale.CHINA
-            "KRW" -> Locale.KOREA
-            "MYR" -> Locale("ms", "MY")
-            "THB" -> Locale("th", "TH")
-            else -> Locale.US
-        }
-    }
-
-    private fun showAddDialog() {
-        val dialogView = LayoutInflater.from(requireContext())
-            .inflate(R.layout.fragment_add_transacction, null)
+    private fun showEditDialog(transaction: Transaction) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.fragment_edit_transaction, null)
         val titleInput = dialogView.findViewById<TextInputEditText>(R.id.input_title)
         val amountInput = dialogView.findViewById<TextInputEditText>(R.id.input_amount)
         val radioIncome = dialogView.findViewById<RadioButton>(R.id.radio_income)
         val radioExpense = dialogView.findViewById<RadioButton>(R.id.radio_expense)
+        val spinnerCurrency = dialogView.findViewById<Spinner>(R.id.spinner_currency)
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("Tambah Transaksi")
-            .setView(dialogView)
-            .setPositiveButton("Simpan") { _, _ ->
-                val newTransaction = Transaction(
-                    title = titleInput.text.toString(),
-                    amount = amountInput.text.toString().toDoubleOrNull() ?: 0.0,
-                    type = if (radioIncome.isChecked) "INCOME" else "EXPENSE",
-                    date = System.currentTimeMillis()
-                )
-                lifecycleScope.launch {
-                    AppDatabase.getDatabase(requireContext()).transactionDao().insert(newTransaction)
-                }
-            }
-            .setNegativeButton("Batal", null)
-            .show()
-    }
-
-    private fun showEditDialog(transaction: Transaction) {
-        val dialogVieww = LayoutInflater.from(requireContext())
-            .inflate(R.layout.fragment_edit_transaction, null)
-        val titleInput = dialogVieww.findViewById<TextInputEditText>(R.id.input_title)
-        val amountInput = dialogVieww.findViewById<TextInputEditText>(R.id.input_amount)
-        val radioIncome = dialogVieww.findViewById<RadioButton>(R.id.radio_income)
-        val radioExpense = dialogVieww.findViewById<RadioButton>(R.id.radio_expense)
+        val adapter = ArrayAdapter.createFromResource(
+            requireContext(),
+            R.array.transaction_currencies,
+            android.R.layout.simple_spinner_item
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerCurrency.adapter = adapter
 
         titleInput.setText(transaction.title)
-        amountInput.setText(transaction.amount.toString())
+        // PERUBAHAN DI SINI: Gunakan toPlainString() untuk menghindari notasi ilmiah
+        amountInput.setText(BigDecimal(transaction.amount).toPlainString())
+
         if (transaction.type == "INCOME") radioIncome.isChecked = true else radioExpense.isChecked = true
+        val currencyPosition = adapter.getPosition(transaction.currency)
+        spinnerCurrency.setSelection(currencyPosition)
 
         AlertDialog.Builder(requireContext())
             .setTitle("Edit Transaksi")
-            .setView(dialogVieww)
+            .setView(dialogView)
             .setPositiveButton("Simpan") { _, _ ->
                 val updated = transaction.copy(
                     title = titleInput.text.toString(),
-                    amount = amountInput.text.toString().toDoubleOrNull() ?: 0.0,
+                    amount = amountInput.text.toString().toDoubleOrNull() ?: transaction.amount,
                     type = if (radioIncome.isChecked) "INCOME" else "EXPENSE",
-                    date = System.currentTimeMillis()
+                    currency = spinnerCurrency.selectedItem.toString()
                 )
                 lifecycleScope.launch {
                     AppDatabase.getDatabase(requireContext()).transactionDao().update(updated)
@@ -258,9 +237,47 @@ class TransactionsFragment : Fragment() {
                     AppDatabase.getDatabase(requireContext()).transactionDao().delete(transaction)
                 }
             }
-            .setNegativeButton("Batal") { _, _ ->
+            .setNegativeButton("Batal") { dialog, _ ->
+                position?.let { transactionAdapter.notifyItemChanged(it) }
+                dialog.dismiss()
+            }
+            .setOnCancelListener {
                 position?.let { transactionAdapter.notifyItemChanged(it) }
             }
             .show()
+    }
+
+    private fun setupSwipeToDelete(recyclerView: RecyclerView) {
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder) = false
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val transaction = transactionAdapter.getTransactionAt(position)
+                if (direction == ItemTouchHelper.LEFT) {
+                    showDeleteDialog(transaction, position)
+                } else {
+                    showEditDialog(transaction)
+                    transactionAdapter.notifyItemChanged(position)
+                }
+            }
+        }).attachToRecyclerView(recyclerView)
+    }
+
+    private fun getLocaleForCurrency(currency: String): Locale {
+        return when (currency) {
+            "IDR" -> Locale("in", "ID")
+            "USD" -> Locale.US
+            "EUR" -> Locale.GERMANY
+            "JPY" -> Locale.JAPAN
+            "GBP" -> Locale.UK
+            "AUD" -> Locale("en", "AU")
+            "SGD" -> Locale("en", "SG")
+            "CNY" -> Locale.CHINA
+            "KRW" -> Locale.KOREA
+            "MYR" -> Locale("ms", "MY")
+            "THB" -> Locale("th", "TH")
+            else -> Locale.US
+        }
     }
 }
