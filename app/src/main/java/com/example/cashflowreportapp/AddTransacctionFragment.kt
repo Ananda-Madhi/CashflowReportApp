@@ -29,9 +29,8 @@ class AddTransactionFragment : Fragment() {
         val inputAmount = view.findViewById<TextInputEditText>(R.id.input_amount)
         val radioIncome = view.findViewById<RadioButton>(R.id.radio_income)
         val buttonSave = view.findViewById<Button>(R.id.button_save)
-        val spinnerCurrency = view.findViewById<Spinner>(R.id.spinner_currency) // <-- TAMBAHAN
+        val spinnerCurrency = view.findViewById<Spinner>(R.id.spinner_currency)
 
-        // Setup Spinner Adapter
         ArrayAdapter.createFromResource(
             requireContext(),
             R.array.transaction_currencies,
@@ -46,7 +45,7 @@ class AddTransactionFragment : Fragment() {
             val amount = inputAmount.text.toString().toDoubleOrNull()
             val type = if (radioIncome.isChecked) "INCOME" else "EXPENSE"
             val date = System.currentTimeMillis()
-            val currency = spinnerCurrency.selectedItem.toString() // <-- TAMBAHAN
+            val currency = spinnerCurrency.selectedItem.toString()
 
             if (title.isNotBlank() && amount != null && amount > 0) {
                 val transaction = Transaction(
@@ -54,11 +53,10 @@ class AddTransactionFragment : Fragment() {
                     amount = amount,
                     type = type,
                     date = date,
-                    currency = currency // <-- TAMBAHAN
+                    currency = currency
                 )
                 lifecycleScope.launch {
                     AppDatabase.getDatabase(requireContext()).transactionDao().insert(transaction)
-                    // Kembali ke halaman sebelumnya setelah berhasil menyimpan
                     findNavController().navigateUp()
                 }
             } else {

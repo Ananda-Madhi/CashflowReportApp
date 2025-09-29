@@ -19,7 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import java.math.BigDecimal // <-- TAMBAHAN: Import ini
+import java.math.BigDecimal
 import java.net.HttpURLConnection
 import java.net.URL
 import java.text.NumberFormat
@@ -203,7 +203,6 @@ class TransactionsFragment : Fragment() {
         spinnerCurrency.adapter = adapter
 
         titleInput.setText(transaction.title)
-        // PERUBAHAN DI SINI: Gunakan toPlainString() untuk menghindari notasi ilmiah
         amountInput.setText(BigDecimal(transaction.amount).toPlainString())
 
         if (transaction.type == "INCOME") radioIncome.isChecked = true else radioExpense.isChecked = true
@@ -231,7 +230,7 @@ class TransactionsFragment : Fragment() {
     private fun showDeleteDialog(transaction: Transaction, position: Int? = null) {
         AlertDialog.Builder(requireContext())
             .setTitle("Hapus Transaksi")
-            .setMessage("Yakin mau hapus transaksi \"${transaction.title}\"?")
+            .setMessage("Hapus Transaksi? \"${transaction.title}\"?")
             .setPositiveButton("Hapus") { _, _ ->
                 lifecycleScope.launch {
                     AppDatabase.getDatabase(requireContext()).transactionDao().delete(transaction)

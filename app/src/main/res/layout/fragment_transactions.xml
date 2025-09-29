@@ -13,7 +13,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Summary Card (top stays visible) -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/summary_card"
             android:layout_width="match_parent"
@@ -28,7 +27,6 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- Currency Picker -->
                 <Spinner
                     android:id="@+id/currencySpinner"
                     android:layout_width="wrap_content"
@@ -36,7 +34,6 @@
                     android:layout_gravity="end"
                     android:layout_marginBottom="12dp" />
 
-                <!-- Converted Balance -->
                 <TextView
                     android:id="@+id/convertedBalance"
                     android:layout_width="wrap_content"
@@ -47,7 +44,6 @@
                     android:layout_marginBottom="12dp"
                     android:textAppearance="?attr/textAppearanceBodyMedium"/>
 
-                <!-- Total Income -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -71,7 +67,6 @@
                         android:textSize="15sp" />
                 </LinearLayout>
 
-                <!-- Total Expense -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -95,14 +90,12 @@
                         android:textSize="15sp" />
                 </LinearLayout>
 
-                <!-- Divider -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginVertical="8dp"
                     android:background="?attr/colorOutline" />
 
-                <!-- Balance -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -127,7 +120,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- RecyclerView (scrolls below) -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"

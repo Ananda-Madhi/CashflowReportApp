@@ -39,7 +39,6 @@ class TransactionAdapter(
         val sdf = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
         holder.date.text = sdf.format(Date(transaction.date))
 
-        // PERUBAHAN: Format amount berdasarkan mata uang
         holder.amount.text = formatCurrency(transaction.amount, transaction.currency)
 
         if (transaction.type == "EXPENSE") {
@@ -52,7 +51,6 @@ class TransactionAdapter(
         holder.btnDelete.setOnClickListener { onDeleteClick(transaction) }
     }
 
-    // FUNGSI BARU: untuk format mata uang
     private fun formatCurrency(amount: Double, currencyCode: String): String {
         val locale = when (currencyCode) {
             "IDR" -> Locale("in", "ID")
