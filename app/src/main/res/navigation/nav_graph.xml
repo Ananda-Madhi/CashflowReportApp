@@ -13,4 +13,17 @@
         android:id="@+id/addTransactionFragment"
         android:name="com.example.cashflowreportapp.AddTransactionFragment"
         android:label="Tambah Transaksi" />
+    <fragment
+        android:id="@+id/accountsFragment"
+        android:name="com.example.cashflowreportapp.AccountsFragment"
+        android:label="Accounts"/>
+    <fragment
+        android:id="@+id/accountTransactionsFragment"
+        android:name="com.example.cashflowreportapp.AccountTransactionsFragment"
+        android:label="Account Transactions">
+        <argument
+            android:name="account_name"
+            app:argType="string" />
+    </fragment>
+
 </navigation>

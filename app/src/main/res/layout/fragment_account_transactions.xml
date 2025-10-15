@@ -1,0 +1,50 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/text_account_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Account:"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/text_total_income"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Total Income: Rp 0" />
+
+    <TextView
+        android:id="@+id/text_total_expense"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Total Expense: Rp 0" />
+
+    <TextView
+        android:id="@+id/text_balance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Balance: Rp 0"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginBottom="12dp" />
+
+    <Button
+        android:id="@+id/button_export_pdf"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Export to PDF"
+        android:layout_marginBottom="8dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_account_transactions"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+</LinearLayout>

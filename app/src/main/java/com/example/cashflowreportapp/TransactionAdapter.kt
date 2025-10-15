@@ -13,9 +13,9 @@ import java.util.*
 
 class TransactionAdapter(
     private var transactions: List<Transaction>,
-    private val onEditClick: (Transaction) -> Unit,
-    private val onDeleteClick: (Transaction) -> Unit
-) : RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder>() {
+    private val onEditClick: (Transaction) -> Unit = {},
+    private val onDeleteClick: (Transaction) -> Unit = {}
+): RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder>() {
 
     fun getTransactionAt(position: Int): Transaction {
         return transactions[position]
