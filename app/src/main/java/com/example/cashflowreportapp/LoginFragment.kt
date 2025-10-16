@@ -21,7 +21,7 @@ class LoginFragment : Fragment() {
         super.onStart()
         val currentUser = auth.currentUser
         if (currentUser != null) {
-            findNavController().navigate(R.id.action_loginFragment_to_transactionsFragment) // Sesuaikan ID action
+            findNavController().navigate(R.id.action_loginFragment_to_transactionsFragment)
         }
     }
 

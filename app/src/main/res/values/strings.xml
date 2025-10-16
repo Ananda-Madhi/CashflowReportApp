@@ -1,5 +1,10 @@
 <resources>
     <string name="app_name">CashflowReportApp</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="profile_title">Profil Anda</string>
+    <string name="profile_icon_desc">Ikon profil pengguna</string>
+    <string name="logged_in_as">Masuk sebagai:</string>
+    <string name="view_personal_balance">Lihat Saldo Pribadi</string>
+    <string name="logout">Keluar</string>
 </resources>

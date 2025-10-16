@@ -1,10 +1,9 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp") version "2.0.21-1.0.27"
-    id("com.google.gms.google-services")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    id("kotlin-kapt")
+    alias(libs.plugins.google.gms.google.services)
 }
-
 
 android {
     namespace = "com.example.cashflowreportapp"
@@ -43,17 +42,18 @@ android {
     }
 }
 
-
 dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.itextpdf:itextg:5.5.10")
     implementation("com.android.volley:volley:1.2.1")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
-    implementation(libs.firebase.auth)
+    kapt(libs.androidx.room.compiler)
     implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

@@ -7,10 +7,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.example.cashflowreportapp.R
-import com.google.firebase.auth.FirebaseAuth
 import com.example.cashflowreportapp.databinding.FragmentRegisterBinding
-
+import com.google.firebase.auth.FirebaseAuth
 
 class RegisterFragment : Fragment() {
 
@@ -43,8 +41,8 @@ class RegisterFragment : Fragment() {
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Toast.makeText(context, "Registrasi Berhasil", Toast.LENGTH_SHORT).show()
-                        findNavController().navigate(R.id.action_registerFragment_to_transactionsFragment)
+                        Toast.makeText(context, "Registrasi Berhasil. Silakan login.", Toast.LENGTH_SHORT).show()
+                        findNavController().popBackStack()
                     } else {
                         Toast.makeText(context, "Registrasi Gagal: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                     }

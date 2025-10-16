@@ -26,7 +26,6 @@ class AccountsFragment : Fragment() {
         inputAccount = view.findViewById(R.id.editTextAccount)
         addButton = view.findViewById(R.id.buttonAddAccount)
 
-        // Ensure default account exists
         if (!globalAccounts.contains("You")) {
             globalAccounts.add("You")
         }
@@ -34,7 +33,6 @@ class AccountsFragment : Fragment() {
         adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, accountList)
         listView.adapter = adapter
 
-        // ✅ Add new account
         addButton.setOnClickListener {
             val newAccount = inputAccount.text.toString().trim()
             if (newAccount.isNotEmpty() && !accountList.contains(newAccount)) {
@@ -46,14 +44,12 @@ class AccountsFragment : Fragment() {
             }
         }
 
-        // ✅ Navigate to AccountTransactionsFragment when clicked
         listView.setOnItemClickListener { _, _, position, _ ->
             val selectedAccount = accountList[position]
             val bundle = Bundle().apply {
                 putString("account_name", selectedAccount)
             }
 
-            // Navigate using Navigation Component
             findNavController().navigate(R.id.accountTransactionsFragment, bundle)
         }
 
