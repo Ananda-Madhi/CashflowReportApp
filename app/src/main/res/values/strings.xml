@@ -7,4 +7,10 @@
     <string name="logged_in_as">Masuk sebagai:</string>
     <string name="view_personal_balance">Lihat Saldo Pribadi</string>
     <string name="logout">Keluar</string>
+
+    <string name="export">Ekspor</string>
+    <string name="balance">Saldo Saat Ini</string>
+    <string name="total_income">Total Pemasukan</string>
+    <string name="total_expense">Total Pengeluaran</string>
+    <string name="transaction_history">Riwayat Transaksi</string>
 </resources>
