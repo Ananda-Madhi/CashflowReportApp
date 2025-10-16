@@ -8,4 +8,8 @@
         android:id="@+id/addTransactionFragment"
         android:icon="@drawable/ic_add"
         android:title="Add" />
+    <item
+        android:id="@+id/accountsFragment"
+        android:icon="@drawable/ic_person"
+        android:title="Accounts" />
 </menu>

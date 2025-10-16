@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/loginFragment">
+    app:startDestination="@id/transactionsFragment">
 
     <fragment
         android:id="@+id/transactionsFragment"
@@ -15,29 +14,16 @@
         android:name="com.example.cashflowreportapp.AddTransactionFragment"
         android:label="Tambah Transaksi" />
     <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.example.cashflowreportapp.LoginFragment"
-        android:label="LoginFragment"
-        tools:layout="@layout/fragment_login" >
-        <action
-            android:id="@+id/action_loginFragment_to_transactionsFragment"
-            app:destination="@id/transactionsFragment"
-            app:popUpTo="@id/loginFragment"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_loginFragment_to_registerFragment"
-            app:destination="@id/registerFragment" />
+        android:id="@+id/accountsFragment"
+        android:name="com.example.cashflowreportapp.AccountsFragment"
+        android:label="Accounts"/>
+    <fragment
+        android:id="@+id/accountTransactionsFragment"
+        android:name="com.example.cashflowreportapp.AccountTransactionsFragment"
+        android:label="Account Transactions">
+        <argument
+            android:name="account_name"
+            app:argType="string" />
     </fragment>
 
-    <fragment
-        android:id="@+id/registerFragment"
-        android:name="com.example.cashflowreportapp.RegisterFragment"
-        android:label="RegisterFragment"
-        tools:layout="@layout/fragment_register" >
-        <action
-            android:id="@+id/action_registerFragment_to_transactionsFragment"
-            app:destination="@id/transactionsFragment"
-            app:popUpTo="@id/loginFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
 </navigation>

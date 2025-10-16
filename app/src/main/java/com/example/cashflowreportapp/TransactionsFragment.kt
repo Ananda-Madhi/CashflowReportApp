@@ -18,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.text.NumberFormat
@@ -70,7 +69,7 @@ class TransactionsFragment : Fragment() {
         )
         recyclerView.adapter = transactionAdapter
 
-        // Observe daftar transaksi
+        // Observe all transactions
         transactionDao.getAllTransactions().observe(viewLifecycleOwner) { transactions ->
             transactionAdapter.updateData(transactions)
         }
@@ -91,7 +90,9 @@ class TransactionsFragment : Fragment() {
         val itemTouchHelper = ItemTouchHelper(object :
             ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
             override fun onMove(
-                recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
             ) = false
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -108,19 +109,22 @@ class TransactionsFragment : Fragment() {
         })
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
-        // Spinner currency
+        // Spinner currency setup
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, currencies)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         currencySpinner.adapter = adapter
 
         currencySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?, view: View?, position: Int, id: Long
+            ) {
                 updateConvertedBalance()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
     }
+
     private fun updateConvertedBalance() {
         val selectedCurrency = currencySpinner.selectedItem?.toString() ?: return
         val balance = totalIncome - totalExpense
@@ -136,6 +140,7 @@ class TransactionsFragment : Fragment() {
             }
         }
     }
+
     private fun updateBalanceUI() {
         val balance = totalIncome - totalExpense
         val formatter = NumberFormat.getCurrencyInstance(Locale("in", "ID"))
@@ -143,12 +148,8 @@ class TransactionsFragment : Fragment() {
         textTotalIncome.text = formatter.format(totalIncome)
         textTotalExpense.text = formatter.format(totalExpense)
         textBalance.text = formatter.format(balance)
-
-        // update balance konversi juga
         updateConvertedBalance()
     }
-
-
 
     private suspend fun fetchExchangeRate(from: String, to: String): Double {
         return withContext(Dispatchers.IO) {
@@ -161,13 +162,10 @@ class TransactionsFragment : Fragment() {
                     val result = reader.readText()
                     val json = JSONObject(result)
 
-                    // cek dulu status respons
                     if (json.optString("result") == "success") {
                         val rates = json.getJSONObject("rates")
                         return@withContext rates.optDouble(to, 0.0)
-                    } else {
-                        return@withContext 0.0
-                    }
+                    } else 0.0
                 }
             } catch (e: Exception) {
                 Log.e("ExchangeRate", "Error fetching exchange rate", e)
@@ -175,7 +173,6 @@ class TransactionsFragment : Fragment() {
             }
         }
     }
-
 
     private fun getLocaleForCurrency(currency: String): Locale {
         return when (currency) {
@@ -193,6 +190,7 @@ class TransactionsFragment : Fragment() {
         }
     }
 
+    // ✅ Updated Add Transaction dialog with Account Spinner
     private fun showAddDialog() {
         val dialogView = LayoutInflater.from(requireContext())
             .inflate(R.layout.fragment_add_transacction, null)
@@ -200,6 +198,20 @@ class TransactionsFragment : Fragment() {
         val amountInput = dialogView.findViewById<TextInputEditText>(R.id.input_amount)
         val radioIncome = dialogView.findViewById<RadioButton>(R.id.radio_income)
         val radioExpense = dialogView.findViewById<RadioButton>(R.id.radio_expense)
+        val spinnerAccount = dialogView.findViewById<Spinner>(R.id.spinnerAccount)
+        // 🔗 Load accounts from AccountsFragment.globalAccounts
+        val accountsList = if (AccountsFragment.globalAccounts.isNotEmpty()) {
+            AccountsFragment.globalAccounts
+        } else {
+            listOf("Cash", "Bank", "Other")
+        }
+
+        val accountAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_dropdown_item,
+            accountsList
+        )
+        spinnerAccount.adapter = accountAdapter
 
         AlertDialog.Builder(requireContext())
             .setTitle("Tambah Transaksi")
@@ -209,7 +221,8 @@ class TransactionsFragment : Fragment() {
                     title = titleInput.text.toString(),
                     amount = amountInput.text.toString().toDoubleOrNull() ?: 0.0,
                     type = if (radioIncome.isChecked) "INCOME" else "EXPENSE",
-                    date = System.currentTimeMillis()
+                    date = System.currentTimeMillis(),
+                    account = spinnerAccount.selectedItem.toString() // ✅ save selected account
                 )
                 lifecycleScope.launch {
                     AppDatabase.getDatabase(requireContext()).transactionDao().insert(newTransaction)
@@ -220,12 +233,12 @@ class TransactionsFragment : Fragment() {
     }
 
     private fun showEditDialog(transaction: Transaction) {
-        val dialogVieww = LayoutInflater.from(requireContext())
+        val dialogView = LayoutInflater.from(requireContext())
             .inflate(R.layout.fragment_edit_transaction, null)
-        val titleInput = dialogVieww.findViewById<TextInputEditText>(R.id.input_title)
-        val amountInput = dialogVieww.findViewById<TextInputEditText>(R.id.input_amount)
-        val radioIncome = dialogVieww.findViewById<RadioButton>(R.id.radio_income)
-        val radioExpense = dialogVieww.findViewById<RadioButton>(R.id.radio_expense)
+        val titleInput = dialogView.findViewById<TextInputEditText>(R.id.input_title)
+        val amountInput = dialogView.findViewById<TextInputEditText>(R.id.input_amount)
+        val radioIncome = dialogView.findViewById<RadioButton>(R.id.radio_income)
+        val radioExpense = dialogView.findViewById<RadioButton>(R.id.radio_expense)
 
         titleInput.setText(transaction.title)
         amountInput.setText(transaction.amount.toString())
@@ -233,7 +246,7 @@ class TransactionsFragment : Fragment() {
 
         AlertDialog.Builder(requireContext())
             .setTitle("Edit Transaksi")
-            .setView(dialogVieww)
+            .setView(dialogView)
             .setPositiveButton("Simpan") { _, _ ->
                 val updated = transaction.copy(
                     title = titleInput.text.toString(),

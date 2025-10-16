@@ -45,6 +45,7 @@ android {
 
 
 dependencies {
+    implementation("com.itextpdf:itextg:5.5.10")
     implementation("com.android.volley:volley:1.2.1")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")

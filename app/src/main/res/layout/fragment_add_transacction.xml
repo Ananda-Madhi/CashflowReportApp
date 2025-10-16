@@ -12,7 +12,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/input_title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -23,28 +23,47 @@
             android:id="@+id/input_amount"
             android:inputType="numberDecimal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- New Spinner to choose the account -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="This transaction is from:"
+        android:layout_marginTop="10dp" />
+
+    <Spinner
+        android:id="@+id/spinnerAccount"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:minHeight="48dp"
+        android:paddingVertical="8dp"
+        android:layout_marginTop="12dp"
+        android:spinnerMode="dropdown" />
+
 
     <RadioGroup
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
         <RadioButton
             android:id="@+id/radio_income"
             android:text="Income"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
         <RadioButton
             android:id="@+id/radio_expense"
             android:text="Expense"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
     </RadioGroup>
 
     <Button
         android:id="@+id/button_save"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Simpan"/>
+        android:text="Simpan"
+        android:layout_marginTop="10dp" />
 </LinearLayout>
