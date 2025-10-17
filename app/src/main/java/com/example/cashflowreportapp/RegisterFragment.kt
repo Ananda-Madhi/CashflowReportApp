@@ -29,6 +29,11 @@ class RegisterFragment : Fragment() {
 
         auth = FirebaseAuth.getInstance()
 
+        // Logika untuk tombol kembali
+        binding.ivBack.setOnClickListener {
+            findNavController().popBackStack()
+        }
+
         binding.btnRegister.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()

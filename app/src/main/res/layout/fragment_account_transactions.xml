@@ -8,13 +8,25 @@
     android:padding="16dp"
     tools:context=".AccountTransactionsFragment">
 
+    <ImageView
+        android:id="@+id/iv_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_arrow_back"
+        app:tint="?attr/colorOnSurface"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/text_account_name"
+        app:layout_constraintBottom_toBottomOf="@id/text_account_name"
+        android:contentDescription="Back Button"/>
+
     <TextView
         android:id="@+id/text_account_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
+        android:layout_marginStart="16dp"
+        android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
         app:layout_constraintEnd_toStartOf="@+id/button_export_pdf"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/iv_back"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Detail Akun: Kas" />
 
@@ -24,6 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/export"
+        app:icon="@drawable/ic_download"
         app:layout_constraintBottom_toBottomOf="@id/text_account_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/text_account_name" />
@@ -49,7 +62,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/balance"
-                android:textAppearance="@style/TextAppearance.Material3.TitleMedium" />
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                android:textColor="@color/text_secondary"/>
 
             <TextView
                 android:id="@+id/text_balance"
@@ -85,7 +99,7 @@
                         android:id="@+id/text_total_income"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@android:color/holo_green_dark"
+                        android:textColor="@color/income_green"
                         android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                         tools:text="Rp 5.000.000" />
                 </LinearLayout>
@@ -104,7 +118,7 @@
                         android:id="@+id/text_total_expense"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@android:color/holo_red_dark"
+                        android:textColor="@color/expense_red"
                         android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                         tools:text="Rp 1.500.000" />
                 </LinearLayout>

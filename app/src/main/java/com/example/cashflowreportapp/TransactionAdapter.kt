@@ -1,30 +1,24 @@
 package com.example.cashflowreportapp
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cashflowreportapp.database.Transaction
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
 class TransactionAdapter(
-    private var transactions: List<Transaction>,
-    private val onEditClick: (Transaction) -> Unit = {},
-    private val onDeleteClick: (Transaction) -> Unit = {}
-): RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder>() {
-
-    fun getTransactionAt(position: Int): Transaction {
-        return transactions[position]
-    }
-
-    fun updateData(newTransactions: List<Transaction>) {
-        this.transactions = newTransactions
-        notifyDataSetChanged()
-    }
+    private val onEditClick: (Transaction) -> Unit,
+    private val onDeleteClick: (Transaction) -> Unit
+) : ListAdapter<Transaction, TransactionAdapter.TransactionViewHolder>(TransactionDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_transaction, parent, false)
@@ -32,32 +26,49 @@ class TransactionAdapter(
     }
 
     override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
-        val transaction = transactions[position]
-        holder.title.text = transaction.title
-
-        val sdf = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
-        holder.date.text = sdf.format(Date(transaction.date))
-
-        val formattedAmount = String.format(Locale.GERMANY, "Rp %,.0f", transaction.amount)
-        holder.amount.text = formattedAmount
-
-        if (transaction.type == "EXPENSE") {
-            holder.amount.setTextColor(Color.RED)
-        } else {
-            holder.amount.setTextColor(Color.GREEN)
-        }
-
-        holder.btnEdit.setOnClickListener { onEditClick(transaction) }
-        holder.btnDelete.setOnClickListener { onDeleteClick(transaction) }
+        val transaction = getItem(position)
+        // Kita tidak perlu lagi btnEdit dan btnDelete di sini karena sudah disembunyikan
+        holder.bind(transaction)
     }
 
-    override fun getItemCount() = transactions.size
+    fun getTransactionAt(position: Int): Transaction {
+        return getItem(position)
+    }
 
     class TransactionViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val title: TextView = view.findViewById(R.id.transaction_title)
-        val date: TextView = view.findViewById(R.id.transaction_date)
-        val amount: TextView = view.findViewById(R.id.transaction_amount)
-        val btnEdit: ImageButton = view.findViewById(R.id.btn_edit)
-        val btnDelete: ImageButton = view.findViewById(R.id.btn_delete)
+        private val title: TextView = view.findViewById(R.id.transaction_title)
+        private val account: TextView = view.findViewById(R.id.transaction_account)
+        private val amount: TextView = view.findViewById(R.id.transaction_amount)
+        private val icon: ImageView = view.findViewById(R.id.iv_transaction_icon)
+        private val context = view.context
+
+        fun bind(transaction: Transaction) {
+            title.text = transaction.title
+            account.text = "Akun: ${transaction.account}"
+
+            val formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("in-ID"))
+            formatter.maximumFractionDigits = 0
+            amount.text = formatter.format(transaction.amount)
+
+            if (transaction.type == "EXPENSE") {
+                amount.setTextColor(ContextCompat.getColor(context, R.color.expense_red))
+                icon.setImageResource(R.drawable.ic_arrow_downward)
+                icon.setColorFilter(ContextCompat.getColor(context, R.color.expense_red))
+            } else { // INCOME
+                amount.setTextColor(ContextCompat.getColor(context, R.color.income_green))
+                icon.setImageResource(R.drawable.ic_arrow_upward)
+                icon.setColorFilter(ContextCompat.getColor(context, R.color.income_green))
+            }
+        }
+    }
+
+    class TransactionDiffCallback : DiffUtil.ItemCallback<Transaction>() {
+        override fun areItemsTheSame(oldItem: Transaction, newItem: Transaction): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Transaction, newItem: Transaction): Boolean {
+            return oldItem == newItem
+        }
     }
 }

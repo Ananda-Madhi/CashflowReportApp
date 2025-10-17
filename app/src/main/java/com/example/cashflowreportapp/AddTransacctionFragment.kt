@@ -1,63 +1,84 @@
 package com.example.cashflowreportapp
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-import com.google.android.material.textfield.TextInputEditText
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
+import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.cashflowreportapp.database.AppDatabase
 import com.example.cashflowreportapp.database.Transaction
+import com.example.cashflowreportapp.databinding.FragmentAddTransacctionBinding
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.launch
 
-class AddTransactionFragment : Fragment() {
+class AddTransactionFragment : BottomSheetDialogFragment() {
 
-    private lateinit var spinnerAccount: Spinner
+    private var _binding: FragmentAddTransacctionBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, R.style.CustomBottomSheetDialogTheme)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_add_transacction, container, false)
+    ): View {
+        _binding = FragmentAddTransacctionBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val inputTitle = view.findViewById<TextInputEditText>(R.id.input_title)
-        val inputAmount = view.findViewById<TextInputEditText>(R.id.input_amount)
-        val radioIncome = view.findViewById<RadioButton>(R.id.radio_income)
-        val radioExpense = view.findViewById<RadioButton>(R.id.radio_expense)
-        val buttonSave = view.findViewById<Button>(R.id.button_save)
-
-        // ✅ Setup spinner for account selection
-        spinnerAccount = view.findViewById(R.id.spinnerAccount)
         val accountAdapter = ArrayAdapter(
             requireContext(),
-            android.R.layout.simple_spinner_dropdown_item,
+            android.R.layout.simple_dropdown_item_1line,
             AccountsFragment.globalAccounts
         )
-        spinnerAccount.adapter = accountAdapter
+        (binding.spinnerAccount as? AutoCompleteTextView)?.setAdapter(accountAdapter)
 
-        buttonSave.setOnClickListener {
-            val title = inputTitle.text.toString()
-            val amount = inputAmount.text.toString().toDoubleOrNull() ?: 0.0
-            val type = if (radioIncome.isChecked) "INCOME" else "EXPENSE"
+        binding.buttonSave.setOnClickListener {
+            // ▼▼▼ LOGIKA DIPERBARUI UNTUK MEMBACA TOMBOL ▼▼▼
+
+            // Validasi untuk memastikan tipe transaksi sudah dipilih
+            if (binding.toggleButtonGroup.checkedButtonId == -1) { // -1 berarti tidak ada yang dipilih
+                Toast.makeText(requireContext(), "Harap pilih tipe transaksi (Pemasukan/Pengeluaran)", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val title = binding.inputTitle.text.toString().trim()
+            val amount = binding.inputAmount.text.toString().toDoubleOrNull() ?: 0.0
+
+            // Menentukan tipe berdasarkan tombol yang dipilih
+            val type = if (binding.toggleButtonGroup.checkedButtonId == R.id.btn_income) {
+                "INCOME"
+            } else {
+                "EXPENSE"
+            }
+
             val date = System.currentTimeMillis()
-            val account = spinnerAccount.selectedItem?.toString() ?: ""  // ✅ FIXED
+            val account = binding.spinnerAccount.text.toString()
 
             if (title.isNotBlank() && amount > 0 && account.isNotBlank()) {
                 val transaction = Transaction(0, title, amount, type, date, account)
                 lifecycleScope.launch {
                     AppDatabase.getDatabase(requireContext()).transactionDao().insert(transaction)
-                    activity?.onBackPressed()
+                    dismiss()
                 }
             } else {
-                Toast.makeText(requireContext(), "Please fill all fields!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Harap isi semua kolom dengan benar!", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

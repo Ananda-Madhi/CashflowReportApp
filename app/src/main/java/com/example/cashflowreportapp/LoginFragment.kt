@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
-import com.example.cashflowreportapp.R
 import com.example.cashflowreportapp.databinding.FragmentLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 
@@ -21,7 +21,7 @@ class LoginFragment : Fragment() {
         super.onStart()
         val currentUser = auth.currentUser
         if (currentUser != null) {
-            findNavController().navigate(R.id.action_loginFragment_to_transactionsFragment)
+            navigateToTransactions()
         }
     }
 
@@ -57,7 +57,7 @@ class LoginFragment : Fragment() {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Toast.makeText(context, "Login Berhasil", Toast.LENGTH_SHORT).show()
-                        findNavController().navigate(R.id.action_loginFragment_to_transactionsFragment)
+                        navigateToTransactions()
                     } else {
                         Toast.makeText(
                             context,
@@ -67,6 +67,14 @@ class LoginFragment : Fragment() {
                     }
                 }
         }
+    }
+
+    private fun navigateToTransactions() {
+        val navOptions = NavOptions.Builder()
+            .setPopUpTo(R.id.nav_graph, true)
+            .build()
+
+        findNavController().navigate(R.id.transactionsFragment, null, navOptions)
     }
 
     override fun onDestroyView() {

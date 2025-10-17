@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
+    android:padding="16dp"
     tools:context=".YouFragment">
 
     <TextView
@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/profile_title"
-        android:textAppearance="@style/TextAppearance.Material3.HeadlineLarge"
+        android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -21,9 +21,9 @@
         android:id="@+id/card_profile_info"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
+        app:cardElevation="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_profile_title">
@@ -35,13 +35,15 @@
 
             <ImageView
                 android:id="@+id/iv_profile_icon"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
                 android:contentDescription="@string/profile_icon_desc"
                 android:src="@drawable/ic_account"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="?attr/colorPrimary" />
+                app:tint="?attr/colorPrimary"
+                android:background="@drawable/circular_grey_background"
+                android:padding="12dp"/>
 
             <TextView
                 android:id="@+id/tv_logged_in_as"
@@ -58,7 +60,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="4dp"
                 android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@id/iv_profile_icon"
@@ -75,19 +76,12 @@
         style="@style/Widget.Material3.Button.TonalButton"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
         android:text="@string/view_personal_balance"
         app:icon="@drawable/ic_balance"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/card_profile_info" />
-
-    <View
-        android:id="@+id/spacer"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/btn_logout"
-        app:layout_constraintTop_toBottomOf="@id/btn_view_balance" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_logout"
