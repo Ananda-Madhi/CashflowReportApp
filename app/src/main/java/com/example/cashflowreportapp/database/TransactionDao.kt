@@ -22,6 +22,9 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE account = :accountName ORDER BY date DESC")
     fun getTransactionsByAccount(accountName: String): LiveData<List<Transaction>>
 
+    @Query("SELECT SUM(amount) FROM transactions WHERE type = :type AND date BETWEEN :startDate AND :endDate")
+    suspend fun getTotalAmountByTypeAndDate(type: String, startDate: String, endDate: String): Double?
+
     @Delete
     suspend fun delete(transaction: Transaction)
 }

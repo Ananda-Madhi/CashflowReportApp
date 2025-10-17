@@ -25,6 +25,12 @@
         android:label="RegisterFragment" />
 
     <fragment
+        android:id="@+id/recapFragment"
+        android:name="com.example.cashflowreportapp.RecapFragment"
+        android:label="Rekap"
+        tools:layout="@layout/fragment_recap" />
+
+    <fragment
         android:id="@+id/transactionsFragment"
         android:name="com.example.cashflowreportapp.TransactionsFragment"
         android:label="Transaksi" />

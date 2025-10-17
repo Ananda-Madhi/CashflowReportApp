@@ -9,6 +9,10 @@
         android:icon="@drawable/ic_analytics"
         android:title="Analitik"/>
     <item
+        android:id="@+id/recapFragment"
+        android:icon="@drawable/ic_recap"
+        android:title="Rekap" />
+    <item
         android:id="@+id/addTransactionFragment"
         android:icon="@drawable/ic_add"
         android:title="Add" />
