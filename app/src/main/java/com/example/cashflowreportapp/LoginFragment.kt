@@ -67,6 +67,10 @@ class LoginFragment : Fragment() {
                     }
                 }
         }
+        binding.tvForgotPassword.setOnClickListener {
+            findNavController().navigate(R.id.forgotPasswordFragment)
+        }
+
     }
 
     private fun navigateToTransactions() {

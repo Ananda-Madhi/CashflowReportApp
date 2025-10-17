@@ -52,7 +52,6 @@ class AccountTransactionsFragment : Fragment() {
         textTotalExpense = view.findViewById(R.id.text_total_expense)
         textBalance = view.findViewById(R.id.text_balance)
         textAccountName = view.findViewById(R.id.text_account_name)
-        buttonExportPdf = view.findViewById(R.id.button_export_pdf)
         backButton = view.findViewById(R.id.iv_back) // Inisialisasi tombol kembali
 
         val accountName = arguments?.getString("account_name") ?: "Unknown Account"

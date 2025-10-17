@@ -31,6 +31,11 @@
         tools:layout="@layout/fragment_recap" />
 
     <fragment
+        android:id="@+id/forgotPasswordFragment"
+        android:name="com.example.cashflowreportapp.ForgotPasswordFragment"
+        android:label="Lupa Password" />
+
+    <fragment
         android:id="@+id/transactionsFragment"
         android:name="com.example.cashflowreportapp.TransactionsFragment"
         android:label="Transaksi" />

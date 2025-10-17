@@ -25,21 +25,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-        app:layout_constraintEnd_toStartOf="@+id/button_export_pdf"
         app:layout_constraintStart_toEndOf="@id/iv_back"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Detail Akun: Kas" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/button_export_pdf"
-        style="@style/Widget.Material3.Button.TonalButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/export"
-        app:icon="@drawable/ic_download"
-        app:layout_constraintBottom_toBottomOf="@id/text_account_name"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/text_account_name" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_summary"
