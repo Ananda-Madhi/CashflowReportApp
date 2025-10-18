@@ -116,7 +116,7 @@ class AccountTransactionsFragment : Fragment() {
                 return@launch
             }
 
-            val pdfDir = File(requireContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "CashFlowReports")
+            val pdfDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "CashFlowReports")
             if (!pdfDir.exists()) pdfDir.mkdirs()
 
             val pdfFile = File(pdfDir, "${accountName}_transactions_${System.currentTimeMillis()}.pdf")
