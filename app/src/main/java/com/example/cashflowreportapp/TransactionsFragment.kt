@@ -91,7 +91,8 @@ class TransactionsFragment : Fragment() {
     private fun setupGreeting() {
         val user = auth.currentUser
         val userEmail = user?.email
-        val userName = userEmail?.split("@")?.get(0)?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() } ?: "Pengguna"
+        val userName = userEmail?.split("@")?.get(0)?.replaceFirstChar { if (it.isLowerCase())
+            it.titlecase(Locale.getDefault()) else it.toString() } ?: "Pengguna"
         tvGreeting.text = "Halo, $userName!"
     }
 

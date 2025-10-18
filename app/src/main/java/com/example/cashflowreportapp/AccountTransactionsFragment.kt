@@ -64,7 +64,6 @@ class AccountTransactionsFragment : Fragment() {
         val accountName = arguments?.getString("account_name") ?: "Unknown Account"
         textAccountName.text = accountName
 
-        // Tombol kembali
         backButton.setOnClickListener { findNavController().popBackStack() }
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -130,7 +129,7 @@ class AccountTransactionsFragment : Fragment() {
                 title.alignment = Element.ALIGN_CENTER
                 document.add(title)
 
-                val table = PdfPTable(3) // Kolom: Judul, Jenis, Jumlah
+                val table = PdfPTable(3)
                 table.addCell("Judul")
                 table.addCell("Jenis")
                 table.addCell("Jumlah")

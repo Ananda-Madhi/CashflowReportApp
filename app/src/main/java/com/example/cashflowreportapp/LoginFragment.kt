@@ -11,7 +11,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.cashflowreportapp.databinding.FragmentLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 
-class LoginFragment : Fragment() {
+class   LoginFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!

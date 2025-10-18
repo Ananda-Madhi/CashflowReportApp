@@ -31,7 +31,8 @@ class AccountAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AccountViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_account, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(
+            R.layout.item_account, parent, false)
         return AccountViewHolder(view, onClick)
     }
 

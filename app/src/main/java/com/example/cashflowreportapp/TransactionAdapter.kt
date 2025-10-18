@@ -27,7 +27,6 @@ class TransactionAdapter(
 
     override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
         val transaction = getItem(position)
-        // Kita tidak perlu lagi btnEdit dan btnDelete di sini karena sudah disembunyikan
         holder.bind(transaction)
     }
 

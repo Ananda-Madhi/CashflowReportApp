@@ -114,7 +114,6 @@ class AnalyticsFragment : Fragment() {
         }
 
         val dataSet = BarDataSet(entries, "Pengeluaran per Akun")
-        // GANTI DENGAN WARNA INI
         dataSet.color = ContextCompat.getColor(requireContext(), android.R.color.holo_blue_dark)
         dataSet.valueTextColor = Color.BLACK
         dataSet.valueTextSize = 10f

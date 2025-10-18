@@ -7,7 +7,10 @@ import com.example.cashflowreportapp.database.TransactionDao
 
 class AnalyticsViewModel(private val transactionDao: TransactionDao) : ViewModel() {
 
-    val totalIncome: LiveData<Double?> = transactionDao.getTotalAmountByType("INCOME")
-    val totalExpense: LiveData<Double?> = transactionDao.getTotalAmountByType("EXPENSE")
-    val allTransactions: LiveData<List<Transaction>> = transactionDao.getAllTransactions()
+    val totalIncome: LiveData<Double?> = transactionDao.
+    getTotalAmountByType("INCOME")
+    val totalExpense: LiveData<Double?> = transactionDao.
+    getTotalAmountByType("EXPENSE")
+    val allTransactions: LiveData<List<Transaction>> = transactionDao.
+    getAllTransactions()
 }

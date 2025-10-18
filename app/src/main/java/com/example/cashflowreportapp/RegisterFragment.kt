@@ -29,7 +29,6 @@ class RegisterFragment : Fragment() {
 
         auth = FirebaseAuth.getInstance()
 
-        // Logika untuk tombol kembali
         binding.ivBack.setOnClickListener {
             findNavController().popBackStack()
         }

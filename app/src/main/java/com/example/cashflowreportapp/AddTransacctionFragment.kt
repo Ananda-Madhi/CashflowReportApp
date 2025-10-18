@@ -44,18 +44,17 @@ class AddTransactionFragment : BottomSheetDialogFragment() {
         (binding.spinnerAccount as? AutoCompleteTextView)?.setAdapter(accountAdapter)
 
         binding.buttonSave.setOnClickListener {
-            // ▼▼▼ LOGIKA DIPERBARUI UNTUK MEMBACA TOMBOL ▼▼▼
 
-            // Validasi untuk memastikan tipe transaksi sudah dipilih
-            if (binding.toggleButtonGroup.checkedButtonId == -1) { // -1 berarti tidak ada yang dipilih
-                Toast.makeText(requireContext(), "Harap pilih tipe transaksi (Pemasukan/Pengeluaran)", Toast.LENGTH_SHORT).show()
+            if (binding.toggleButtonGroup.checkedButtonId == -1) {
+                Toast.makeText(requireContext(),
+                    "Harap pilih tipe transaksi (Pemasukan/Pengeluaran)",
+                    Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             val title = binding.inputTitle.text.toString().trim()
             val amount = binding.inputAmount.text.toString().toDoubleOrNull() ?: 0.0
 
-            // Menentukan tipe berdasarkan tombol yang dipilih
             val type = if (binding.toggleButtonGroup.checkedButtonId == R.id.btn_income) {
                 "INCOME"
             } else {
@@ -72,7 +71,8 @@ class AddTransactionFragment : BottomSheetDialogFragment() {
                     dismiss()
                 }
             } else {
-                Toast.makeText(requireContext(), "Harap isi semua kolom dengan benar!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(),
+                    "Harap isi semua kolom dengan benar!", Toast.LENGTH_SHORT).show()
             }
         }
     }

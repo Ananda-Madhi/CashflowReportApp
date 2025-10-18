@@ -114,7 +114,6 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Tombol ekspor PDF -->
     <Button
         android:id="@+id/buttonExportPdf"
         android:layout_width="wrap_content"
