@@ -92,8 +92,8 @@ class RecapFragment : Fragment() {
         val incomeSet = BarDataSet(incomeEntries, "Pemasukan")
         val expenseSet = BarDataSet(expenseEntries, "Pengeluaran")
 
-        incomeSet.color = ContextCompat.getColor(requireContext(), R.color.teal_700)
-        expenseSet.color = ContextCompat.getColor(requireContext(), R.color.purple_500)
+        incomeSet.color = ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark)
+        expenseSet.color = ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark)
         incomeSet.valueTextColor = Color.BLACK
         incomeSet.valueTextSize = 10f
         expenseSet.valueTextColor = Color.BLACK
