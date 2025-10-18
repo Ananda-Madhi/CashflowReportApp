@@ -19,6 +19,9 @@ interface TransactionDao {
     @Update
     suspend fun update(transaction: Transaction)
 
+    @Query("SELECT * FROM transactions WHERE account = :accountName")
+    suspend fun getTransactionsByAccountSync(accountName: String): List<Transaction>
+
     @Query("SELECT * FROM transactions WHERE account = :accountName ORDER BY date DESC")
     fun getTransactionsByAccount(accountName: String): LiveData<List<Transaction>>
 

@@ -12,7 +12,10 @@ import androidx.fragment.app.Fragment
 import com.example.cashflowreportapp.database.AppDatabase
 import com.example.cashflowreportapp.database.Transaction
 import com.example.cashflowreportapp.databinding.FragmentRecapBinding
+import com.github.mikephil.charting.animation.Easing
+import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
@@ -35,16 +38,21 @@ class RecapFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val years = (2020..Calendar.getInstance().get(Calendar.YEAR)).toList().reversed()
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, years)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerYear.adapter = adapter
         binding.spinnerYear.setSelection(0)
+
         binding.spinnerYear.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>, view: View?, position: Int, id: Long
+            ) {
                 selectedYear = years[position]
                 loadRecapData(selectedYear)
             }
+
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
     }
@@ -64,34 +72,61 @@ class RecapFragment : Fragment() {
     private fun setupBarChart(transactions: List<Transaction>) {
         val incomeByMonth = DoubleArray(12)
         val expenseByMonth = DoubleArray(12)
+
         for (t in transactions) {
             val cal = Calendar.getInstance()
             cal.time = Date(t.date)
             val month = cal.get(Calendar.MONTH)
-            if (t.type == "INCOME") incomeByMonth[month] += t.amount else expenseByMonth[month] += t.amount
+            if (t.type == "INCOME") incomeByMonth[month] += t.amount
+            else expenseByMonth[month] += t.amount
         }
+
         val incomeEntries = ArrayList<BarEntry>()
         val expenseEntries = ArrayList<BarEntry>()
+
         for (i in 0..11) {
             incomeEntries.add(BarEntry(i.toFloat(), incomeByMonth[i].toFloat()))
             expenseEntries.add(BarEntry(i.toFloat(), expenseByMonth[i].toFloat()))
         }
+
         val incomeSet = BarDataSet(incomeEntries, "Pemasukan")
         val expenseSet = BarDataSet(expenseEntries, "Pengeluaran")
-        incomeSet.color = ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark)
-        expenseSet.color = ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark)
-        val data = BarData(incomeSet, expenseSet)
-        data.barWidth = 0.4f
-        binding.barChart.data = data
-        val months = arrayOf("Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des")
+
+        incomeSet.color = ContextCompat.getColor(requireContext(), R.color.teal_700)
+        expenseSet.color = ContextCompat.getColor(requireContext(), R.color.purple_500)
+        incomeSet.valueTextColor = Color.BLACK
+        incomeSet.valueTextSize = 10f
+        expenseSet.valueTextColor = Color.BLACK
+        expenseSet.valueTextSize = 10f
+
+        val barData = BarData(incomeSet, expenseSet)
+        barData.barWidth = 0.35f
+        binding.barChart.data = barData
+
+        val months = arrayOf("Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des")
         val xAxis = binding.barChart.xAxis
         xAxis.valueFormatter = IndexAxisValueFormatter(months)
         xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.granularity = 1f
-        binding.barChart.groupBars(0f, 0.1f, 0.05f)
-        binding.barChart.description.isEnabled = false
-        binding.barChart.axisLeft.textColor = Color.BLACK
+        xAxis.textColor = Color.BLACK
+        xAxis.textSize = 12f
+        xAxis.setDrawGridLines(false)
+
+        val leftAxis: YAxis = binding.barChart.axisLeft
+        leftAxis.textColor = Color.BLACK
+        leftAxis.axisMinimum = 0f
         binding.barChart.axisRight.isEnabled = false
+
+        val legend: Legend = binding.barChart.legend
+        legend.textColor = Color.BLACK
+        legend.textSize = 12f
+        legend.formSize = 10f
+        legend.form = Legend.LegendForm.CIRCLE
+
+        binding.barChart.description.isEnabled = false
+        binding.barChart.setFitBars(true)
+        binding.barChart.groupBars(0f, 0.4f, 0.05f)
+        binding.barChart.animateY(1400, Easing.EaseInOutQuad)
         binding.barChart.invalidate()
     }
 

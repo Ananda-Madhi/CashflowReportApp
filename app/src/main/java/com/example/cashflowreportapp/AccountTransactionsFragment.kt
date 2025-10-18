@@ -1,6 +1,7 @@
 package com.example.cashflowreportapp
 
 import android.os.Bundle
+import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,16 +17,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.cashflowreportapp.database.AppDatabase
 import com.example.cashflowreportapp.database.Transaction
 import com.itextpdf.text.Document
+import com.itextpdf.text.Element
 import com.itextpdf.text.Paragraph
+import com.itextpdf.text.pdf.PdfPTable
 import com.itextpdf.text.pdf.PdfWriter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.text.NumberFormat
 import java.util.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import android.os.Environment
 
 class AccountTransactionsFragment : Fragment() {
 
@@ -35,32 +37,35 @@ class AccountTransactionsFragment : Fragment() {
     private lateinit var textBalance: TextView
     private lateinit var textAccountName: TextView
     private lateinit var buttonExportPdf: Button
-    private lateinit var backButton: ImageView // Tambahkan ini
+    private lateinit var backButton: ImageView
     private lateinit var adapter: TransactionAdapter
 
     private var totalIncome = 0.0
     private var totalExpense = 0.0
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_account_transactions, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         recyclerView = view.findViewById(R.id.recycler_view_account_transactions)
         textTotalIncome = view.findViewById(R.id.text_total_income)
         textTotalExpense = view.findViewById(R.id.text_total_expense)
         textBalance = view.findViewById(R.id.text_balance)
         textAccountName = view.findViewById(R.id.text_account_name)
-        backButton = view.findViewById(R.id.iv_back) // Inisialisasi tombol kembali
+        buttonExportPdf = view.findViewById(R.id.buttonExportPdf)
+        backButton = view.findViewById(R.id.iv_back)
 
         val accountName = arguments?.getString("account_name") ?: "Unknown Account"
         textAccountName.text = accountName
 
-        // Logika untuk tombol kembali
-        backButton.setOnClickListener {
-            findNavController().popBackStack()
-        }
+        // Tombol kembali
+        backButton.setOnClickListener { findNavController().popBackStack() }
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -90,27 +95,28 @@ class AccountTransactionsFragment : Fragment() {
         totalExpense = transactions.filter { it.type == "EXPENSE" }.sumOf { it.amount }
         val balance = totalIncome - totalExpense
 
-        val formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("in-ID"))
-        formatter.maximumFractionDigits = 0
+        val formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("in-ID")).apply {
+            maximumFractionDigits = 0
+        }
+
         textTotalIncome.text = formatter.format(totalIncome)
         textTotalExpense.text = formatter.format(totalExpense)
         textBalance.text = formatter.format(balance)
     }
 
     private fun exportToPdf(accountName: String) {
-        // ... (Fungsi exportToPdf tetap sama)
         lifecycleScope.launch(Dispatchers.IO) {
             val dao = AppDatabase.getDatabase(requireContext()).transactionDao()
-            val transactions = dao.getTransactionsByAccount(accountName).value ?: emptyList()
+            val transactions = dao.getTransactionsByAccountSync(accountName)
 
             if (transactions.isEmpty()) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(requireContext(), "No transactions to export", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Tidak ada transaksi untuk diekspor", Toast.LENGTH_SHORT).show()
                 }
                 return@launch
             }
 
-            val pdfDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "CashFlowReports")
+            val pdfDir = File(requireContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "CashFlowReports")
             if (!pdfDir.exists()) pdfDir.mkdirs()
 
             val pdfFile = File(pdfDir, "${accountName}_transactions_${System.currentTimeMillis()}.pdf")
@@ -119,23 +125,37 @@ class AccountTransactionsFragment : Fragment() {
                 val document = Document()
                 PdfWriter.getInstance(document, FileOutputStream(pdfFile))
                 document.open()
-                document.add(Paragraph("Transactions for $accountName\n\n"))
+
+                val title = Paragraph("Laporan Transaksi: $accountName\n\n")
+                title.alignment = Element.ALIGN_CENTER
+                document.add(title)
+
+                val table = PdfPTable(3) // Kolom: Judul, Jenis, Jumlah
+                table.addCell("Judul")
+                table.addCell("Jenis")
+                table.addCell("Jumlah")
+
+                val formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("in-ID"))
 
                 for (t in transactions) {
-                    val formattedAmount = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("in-ID")).format(t.amount)
-                    document.add(Paragraph("${t.title} (${t.type}): $formattedAmount"))
+                    table.addCell(t.title)
+                    table.addCell(if (t.type == "INCOME") "Pemasukan" else "Pengeluaran")
+                    table.addCell(formatter.format(t.amount))
                 }
+
+                document.add(table)
                 document.close()
 
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(requireContext(), "Exported to ${pdfFile.path}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(), "PDF disimpan di: ${pdfFile.path}", Toast.LENGTH_LONG).show()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(requireContext(), "Failed to export PDF", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Gagal mengekspor PDF", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 }
+

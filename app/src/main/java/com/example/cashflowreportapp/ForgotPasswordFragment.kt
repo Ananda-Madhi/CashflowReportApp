@@ -1,6 +1,7 @@
 package com.example.cashflowreportapp
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,9 +12,10 @@ import com.example.cashflowreportapp.databinding.FragmentForgotPasswordBinding
 import com.google.firebase.auth.FirebaseAuth
 
 class ForgotPasswordFragment : Fragment() {
+
     private var _binding: FragmentForgotPasswordBinding? = null
     private val binding get() = _binding!!
-    private lateinit var auth: FirebaseAuth
+    private lateinit var mAuth: FirebaseAuth
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,29 +27,45 @@ class ForgotPasswordFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        auth = FirebaseAuth.getInstance()
+        mAuth = FirebaseAuth.getInstance()
 
-        binding.btnResetPassword.setOnClickListener {
-            val email = binding.etEmail.text.toString().trim()
-            if (email.isEmpty()) {
-                Toast.makeText(context, "Masukkan email terlebih dahulu", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+        binding.btnReset.setOnClickListener {
+            val email = binding.edtForgotPasswordEmail.text.toString().trim()
+
+            if (TextUtils.isEmpty(email)) {
+                binding.edtForgotPasswordEmail.error = "Email tidak boleh kosong"
+            } else {
+                resetPassword(email)
             }
-
-            auth.sendPasswordResetEmail(email)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Toast.makeText(context, "Email reset password telah dikirim", Toast.LENGTH_LONG).show()
-                        findNavController().popBackStack()
-                    } else {
-                        Toast.makeText(context, "Gagal mengirim email: ${task.exception?.message}", Toast.LENGTH_LONG).show()
-                    }
-                }
         }
 
-        binding.ivBack.setOnClickListener {
+        binding.btnForgotPasswordBack.setOnClickListener {
             findNavController().popBackStack()
         }
+    }
+
+    private fun resetPassword(email: String) {
+        binding.forgetPasswordProgressbar.visibility = View.VISIBLE
+        binding.btnReset.visibility = View.INVISIBLE
+
+        mAuth.sendPasswordResetEmail(email)
+            .addOnSuccessListener {
+                Toast.makeText(
+                    requireContext(),
+                    "Link reset password telah dikirim ke email Anda.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                findNavController().popBackStack()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(
+                    requireContext(),
+                    "Gagal mengirim email: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+                binding.forgetPasswordProgressbar.visibility = View.INVISIBLE
+                binding.btnReset.visibility = View.VISIBLE
+            }
     }
 
     override fun onDestroyView() {

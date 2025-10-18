@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:gravity="center_horizontal">
+    android:gravity="center_horizontal"
+    android:background="#FFFFFF">
 
     <TextView
         android:id="@+id/tvTitle"
@@ -15,27 +16,34 @@
         android:text="Rekap Tahunan"
         android:textSize="20sp"
         android:textStyle="bold"
+        android:textColor="#000000"
         android:layout_marginBottom="16dp" />
 
     <Spinner
         android:id="@+id/spinnerYear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp" />
+        android:layout_marginBottom="24dp"
+        android:spinnerMode="dropdown"
+        android:backgroundTint="@color/black" />
 
     <TextView
         android:id="@+id/tvBarTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pendapatan - Pengeluaran per Bulan"
+        android:text="Pendapatan vs Pengeluaran per Bulan"
         android:textStyle="bold"
         android:textSize="16sp"
-        android:layout_marginBottom="8dp" />
+        android:textColor="#333333"
+        android:layout_marginBottom="12dp" />
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/barChart"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:layout_marginBottom="24dp" />
+        android:layout_height="350dp"
+        android:layout_marginBottom="24dp"
+        android:background="#F8F9FA"
+        android:elevation="2dp"
+        android:padding="8dp" />
 
 </LinearLayout>
